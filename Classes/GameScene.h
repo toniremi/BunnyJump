@@ -1,0 +1,28 @@
+#ifndef __HELLOWORLD_SCENE_H__
+#define __HELLOWORLD_SCENE_H__
+
+#include "cocos2d.h"
+
+#include "Character.hpp"
+#include "Platform.hpp"
+
+class GameScene : public cocos2d::Layer
+{
+public:
+    static cocos2d::Scene* createScene();
+
+    virtual bool init();
+    
+    // a selector callback
+    void menuCloseCallback(cocos2d::Ref* pSender);
+    
+    // implement the "static create()" method manually
+    CREATE_FUNC(GameScene);
+    
+    //This is the same type we will pass to the platforms when creating them.
+    //This is to set the aesthethic of the levels.
+    type PlatformType;
+    
+};
+
+#endif // __HELLOWORLD_SCENE_H__
