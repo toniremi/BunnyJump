@@ -43,6 +43,7 @@ private:
     int score;
     int platformsCount;
     int currentPlatformTag;
+    int targetPlatformToReset;
     float lastPlatformYPosition; //Holds the last platform y positon
     
     Size visibleSize;

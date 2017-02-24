@@ -38,6 +38,18 @@ bool GameScene::init()
     //For now we set this manually
     PlatformType = type::grass;
     
+    //Create the nodes here
+    
+    //Level
+    level = Node::create();
+    level->setPosition(Vec2(origin.x, origin.y));
+    this->addChild(level,1);
+    
+    //Create the node platforms to hold all the platforms inside this is to locate them easyly
+    platforms = Node::create();
+    platforms->setPosition(Vec2(0,0));
+    level->addChild(platforms,1);
+    
     // add "Backgrounds" they go one in top of the other one in layers
     auto bkg1 = Sprite::create("bg_layer1.png");
     auto bkg2 = Sprite::create("bg_layer2.png");
@@ -51,22 +63,19 @@ bool GameScene::init()
     bkg4->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
     
     // add the sprite as a child to this layer
-    this->addChild(bkg1, 0);
-    this->addChild(bkg2, 0);
-    this->addChild(bkg3, 0);
-    this->addChild(bkg4, 0);
+    this->addChild(bkg1, 0); //Add backround in the normal node so always stays
+    //This go in level so they will move with it creating the illusion of moving up
+    level->addChild(bkg2, 0);
+    level->addChild(bkg3, 0);
+    level->addChild(bkg4, 0);
     
     //Load character from spritecache
     character = Character::create(gender::male);
     character->setAnchorPoint(Vec2(0.5, 0.5));
     character->setPosition(Vec2(origin.x + visibleSize.width/2 , origin.y + visibleSize.height*0.15));
     
-    this->addChild(character,5);
+    level->addChild(character,5);
     
-    //Create the node platforms to hold all the platforms inside this is to locate them easyly
-    platforms = Node::create();
-    platforms->setPosition(Vec2(origin.x,origin.y));
-    this->addChild(platforms,1);
     
     //Load the first batch of platforms
     instantiateInitialPlatforms();
@@ -106,6 +115,7 @@ void GameScene::instantiateInitialPlatforms () {
     
     //Save this for next platform
     currentPlatformTag = kInitialPlatformTag;
+    targetPlatformToReset = kInitialPlatformTag;
     lastPlatformYPosition = p->getPositionY();
     
     //Add to platfroms node
@@ -126,7 +136,13 @@ void GameScene::instantiatePlatform() {
     //Create platforms
     Platform* p = Platform::create(PlatformType, size::normal, state::normal);
     p->setAnchorPoint(Vec2(0.5, 0.5));
-    p->setTag(currentPlatformTag+1); //Increase the tag
+    
+    //Set the tag. The tags will be rotating among the platforms so
+    int tag = currentPlatformTag+1;
+    //if(tag > kInitialPlatformTag+kNumPlatforms) {
+        //tag = kInitialPlatformTag;
+    //}
+    p->setTag(tag); //Increase the tag
     //Random positioning helper variables
     
     //Get a position being x random in screen and y random inside a certain margin so we can always reach
@@ -164,7 +180,45 @@ void GameScene::update(float dt)
         pos.x = origin.x; //The coordinate of the other side of the scree
         character->setPosition(pos);
     }
-
+    
+    //Get the worlspace for character inside the node level to get its position relative to the screen
+    Vec2 characterPos;
+    characterPos = level->convertToWorldSpace(character->getPosition());
+    CCLOG("Char Position %f",characterPos.y);
+    
+    //Move node down if character avobe half screen
+    if(characterPos.y > origin.y + visibleSize.height/2) {
+        Vec2 pos = level->getPosition();
+        pos.y -= (float)scrollSpeed;
+        level->setPosition(pos);
+    }
+    
+    //If characterpos.y its < 0 means the character fell on the screen so game over
+    if(characterPos.y < 0) {
+        CCLOG("GAME OVER");
+    }
+    
+    //Go trhough the platforms and respawn platforms out of the screen at the bottom for newer ones on top
+    for(const auto &child : platforms->getChildren())
+    {
+        //Get position relative to screen if its negative we need to reset that platform
+        Vec2 platformPos;
+        platformPos = platforms->convertToWorldSpace(child->getPosition());
+        
+        //To avoid poping effect (things dissapeareing in the screen) i added to the y the height of the platform.
+        //This way we make sure we do not delet the platform until the platform its not on the screen. I added ful heigh to have more room.
+        if((platformPos.y+child->getContentSize().height) < 0) {
+            //Platform need to be reseted
+            int platformTag = child->getTag();
+            
+            //Remove this chilg and instantiate a new platform
+            child->removeFromParentAndCleanup(true);
+            
+            //Instantiate the new platform
+            instantiatePlatform();
+            
+        }
+    }
 }
 
 

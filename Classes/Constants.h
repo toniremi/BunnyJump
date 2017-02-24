@@ -17,5 +17,6 @@
 #define kSpringJumpForce 400
 #define kInitialPlatformTag 50 //This is to identify the platforms
 #define kCharacterXVelocity 40; //The velocity at which the character moves on touch on left or right side of the screen
+#define scrollSpeed 4;
 
 #endif /* Constants_h */
