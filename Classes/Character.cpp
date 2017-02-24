@@ -8,6 +8,7 @@
 
 #include "Character.hpp"
 #include "Platform.hpp"
+#include "Constants.h"
 
 using namespace cocos2d;
 
@@ -77,6 +78,8 @@ void Character::initOptions()
     //physicsBody->setCollisionBitmask(0x01);   // 0001
     physicsBody->setContactTestBitmask(0xFFFFFFFF);
     
+    physicsBody->setRotationEnable(false);
+    
     //Add the physics body
     this->addComponent(physicsBody);
     
@@ -115,7 +118,7 @@ bool Character::onContactBegin(cocos2d::PhysicsContact& contact)
                 //Falling
                 falling = true;
                 //Apply velocity
-                vel.y = 300;//upwards - don't change x velocity
+                vel.y = kNormalJumpForce;//upwards - don't change x velocity
                 nodeA->getPhysicsBody()->setVelocity(vel);
             } else {
                 //We dont do anything and let it go through
@@ -138,7 +141,7 @@ bool Character::onContactBegin(cocos2d::PhysicsContact& contact)
                 //Falling
                 falling = true;
                 //Apply velocity
-                vel.y = 300;//upwards - don't change x velocity
+                vel.y = kNormalJumpForce;//upwards - don't change x velocity
                 nodeB->getPhysicsBody()->setVelocity(vel);
             } else {
                 //We dont do anything and let it go through

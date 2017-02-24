@@ -3,7 +3,7 @@
 
 #include "Constants.h"
 
-
+#include <stdlib.h> //For rand()
 
 USING_NS_CC;
 
@@ -32,8 +32,8 @@ bool GameScene::init()
         return false;
     }
     
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    visibleSize = Director::getInstance()->getVisibleSize();
+    origin = Director::getInstance()->getVisibleOrigin();
 
     //For now we set this manually
     PlatformType = type::grass;
@@ -45,10 +45,10 @@ bool GameScene::init()
     auto bkg4 = Sprite::create("bg_layer4.png");
     
     // position the sprite on the center of the screen
-    bkg1->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-    bkg2->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-    bkg3->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-    bkg4->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+    bkg1->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
+    bkg2->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
+    bkg3->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
+    bkg4->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
     
     // add the sprite as a child to this layer
     this->addChild(bkg1, 0);
@@ -57,32 +57,114 @@ bool GameScene::init()
     this->addChild(bkg4, 0);
     
     //Load character from spritecache
-    Character* character = Character::create(gender::male);
+    character = Character::create(gender::male);
     character->setAnchorPoint(Vec2(0.5, 0.5));
-    character->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+    character->setPosition(Vec2(origin.x + visibleSize.width/2 , origin.y + visibleSize.height*0.15));
     
     this->addChild(character,5);
     
-    //Load a platform as test right under character
-    Platform* p = Platform::create(PlatformType, size::normal, state::normal);
-    p->setAnchorPoint(Vec2(0.5, 0.5));
-    p->setPosition(Vec2(character->getPositionX(),character->getPositionY()-character->getContentSize().height));
+    //Create the node platforms to hold all the platforms inside this is to locate them easyly
+    platforms = Node::create();
+    platforms->setPosition(Vec2(origin.x,origin.y));
+    this->addChild(platforms,1);
     
-    this->addChild(p,1);
+    //Load the first batch of platforms
+    instantiateInitialPlatforms();
     
-    Platform* p2 = Platform::create(PlatformType, size::small, state::normal);
-    p2->setAnchorPoint(Vec2(0.5, 0.5));
-    p2->setPosition(Vec2(character->getPositionX(),character->getPositionY()-character->getContentSize().height+100));
+    //Adding touch detector
+    auto listener = EventListenerTouchOneByOne::create();
     
-    this->addChild(p2,1);
+    listener->setSwallowTouches(true);
+    
+    //Event for touch began
+    listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
+    //Event for touch ended
+    listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
+    
+    //Adding listener to events dispatcher
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+    
+    //Schedule the update
+    this->scheduleUpdate();
     
     return true;
 }
 
-void instantiateInitialPlatforms () {
+void GameScene::instantiateInitialPlatforms () {
+    
+    //Always create one platform beneath the player for an easy start
+    Platform* p = Platform::create(PlatformType, size::normal, state::normal);
+    p->setAnchorPoint(Vec2(0.5, 0.5));
+    
+    //Add the tag to identify the platforms tag will start at 50 until 50 + knumPlatforms (as of now 60).
+    //So that means that first platform and the lowest one has tag 50 , next one tag 51 ,...
+    //This will allow us to recycle platforms by looking at currentPlatformTag which will hold the next platform to be deleted
+    p->setTag(kInitialPlatformTag);
+    
+    //Position the first one right beneath the hero to make it an easy start
+    p->setPosition(Vec2(character->getPositionX()-origin.x,character->getPositionY()-character->getContentSize().height-origin.y));
+    
+    //Save this for next platform
+    currentPlatformTag = kInitialPlatformTag;
+    lastPlatformYPosition = p->getPositionY();
+    
+    //Add to platfroms node
+    platforms->addChild(p,0);
     
     //This is a group always the same of platforms so player can never fall at the begining
+   while(currentPlatformTag < (kInitialPlatformTag+kNumPlatforms) ) {
+       instantiatePlatform();
+   }
+}
+
+void GameScene::instantiatePlatform() {
     
+    //Here at some point we will randomize other stuff like the size and state of the platform
+    
+    //Also at some point we may also add enemies on top of this platforms that walk on them or just make them spiked
+    
+    //Create platforms
+    Platform* p = Platform::create(PlatformType, size::normal, state::normal);
+    p->setAnchorPoint(Vec2(0.5, 0.5));
+    p->setTag(currentPlatformTag+1); //Increase the tag
+    //Random positioning helper variables
+    
+    //Get a position being x random in screen and y random inside a certain margin so we can always reach
+    float randX = RandomHelper::random_real((origin.x + p->getContentSize().width/2), ( origin.x + visibleSize.width - p->getContentSize().width/2));
+    //This is the separation between this platform and last one instantiated we need to control this so always can be reached
+    float randYRange = RandomHelper::random_real((float)kMinPlatformStep, (float)kMaxPlatformStep);
+    //Position it on top of last platform with the increased step
+    float randY = lastPlatformYPosition + randYRange;
+    
+    //Set the new position
+    p->setPosition(Vec2(randX, randY));
+    
+    //Save info for next platform
+    currentPlatformTag = p->getTag();
+    lastPlatformYPosition = p->getPositionY();
+    
+    //finally add it to platforms node
+    platforms->addChild(p,0);
+
+}
+
+
+void GameScene::update(float dt)
+{
+    //Character movement
+    //If gets to the edge spawns on the other side of the screen
+    if(character->getPositionX()<origin.x && character->getPhysicsBody()->getVelocity().x < 0) {
+        //Character is moving left and passed the left edge so spawn on the other side
+        Vec2 pos = character->getPosition();
+        pos.x = origin.x + visibleSize.width; //The coordinate of the other side of the scree
+        character->setPosition(pos);
+    } else if(character->getPositionX() > (origin.x + visibleSize.width) && character->getPhysicsBody()->getVelocity().x > 0) {
+        //Character moving to the right and left the edge so spawn on the other side
+        Vec2 pos = character->getPosition();
+        pos.x = origin.x; //The coordinate of the other side of the scree
+        character->setPosition(pos);
+    }
+
 }
 
 
@@ -99,6 +181,38 @@ void GameScene::menuCloseCallback(Ref* pSender)
     
     //EventCustom customEndEvent("game_scene_close_event");
     //_eventDispatcher->dispatchEvent(&customEndEvent);
+}
+
+#pragma mark - Touch Events
+bool GameScene::onTouchBegan(Touch* touch, Event* event)
+{
+    CCLOG("Touched");
     
+    Vec2 p = touch->getLocation();
+    
+    if(p.x > visibleSize.width/2-origin.x) {
+        //Get velocity Y and get float from constant
+        float VelY = character->getPhysicsBody()->getVelocity().y;
+        float velX = (float) kCharacterXVelocity;
+        //Assign new velocity
+        character->getPhysicsBody()->setVelocity(Vec2(velX, VelY));
+    } else {
+        //Get velocity Y and get float from constant
+        float VelY = character->getPhysicsBody()->getVelocity().y;
+        float velX = (float) kCharacterXVelocity;
+        velX = velX * -1; //Negative X velocity to move to left
+        //Assign new velocity
+        character->getPhysicsBody()->setVelocity(Vec2(velX, VelY));
+    }
+    
+    return true;
+}
+
+void GameScene::onTouchEnded(Touch* touch, Event* event) {
+    
+    CCLOG("Not touching");
+    //no velocity on x so we just go up
+    float VelY = character->getPhysicsBody()->getVelocity().y;
+    character->getPhysicsBody()->setVelocity(Vec2(0, VelY));
     
 }
