@@ -34,11 +34,20 @@ public:
     void initOptions();
     
 private:
+    
     //Variables
+    Size _size; //We need to save this for a weird thing. SpriteFrameCache seems to change physics body. So i want to use always same size
     gender _gender;
+    int genderNum; //In the animation the gender has different numbers 1 male , 2 female.
+    
+    //Animation of character
+    Animation *jumpAnim;
     
     //Methods
     bool onContactBegin(PhysicsContact& contact);
+    
+    //Method to make the character jump including the animation
+    void jump();
 };
 
 #endif /* Character_hpp */

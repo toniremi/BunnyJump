@@ -28,13 +28,14 @@ public:
     
 private:
     
-    //This is just ot make it easier to navigate through the platforms in the level
-    Node* platforms;
+
     
     //Layers
-    Node* Background;
-    Node* BkgDetails;
-    Node* level;
+    Node* level; //Inside this node there are also platforms and enemies nodes.
+    //This is just ot make it easier to navigate through the platforms in the level
+    Node* platforms;
+    //This is just ot make it easier to navigate through the enemies in the level
+    Node* enemies;
     Node* Menu;
     
     //A reference to the character created so we can access it through the class

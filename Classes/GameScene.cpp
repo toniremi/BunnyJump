@@ -12,6 +12,11 @@ Scene* GameScene::createScene()
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
     
+    scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    
+    //Increase speed to make things fel snapier
+    scene->getPhysicsWorld()->setSpeed(2.0f);
+    
     // 'layer' is an autorelease object
     auto layer = GameScene::create();
 
@@ -42,6 +47,7 @@ bool GameScene::init()
     
     //Level
     level = Node::create();
+    //Because level position is set at origin we do not need to use origin again in any object that will go inside level
     level->setPosition(Vec2(origin.x, origin.y));
     this->addChild(level,1);
     
@@ -58,9 +64,9 @@ bool GameScene::init()
     
     // position the sprite on the center of the screen
     bkg1->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
-    bkg2->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
-    bkg3->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
-    bkg4->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2));
+    bkg2->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+    bkg3->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+    bkg4->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
     
     // add the sprite as a child to this layer
     this->addChild(bkg1, 0); //Add backround in the normal node so always stays
@@ -72,7 +78,7 @@ bool GameScene::init()
     //Load character from spritecache
     character = Character::create(gender::male);
     character->setAnchorPoint(Vec2(0.5, 0.5));
-    character->setPosition(Vec2(origin.x + visibleSize.width/2 , origin.y + visibleSize.height*0.15));
+    character->setPosition(Vec2(visibleSize.width/2 , visibleSize.height*0.15));
     
     level->addChild(character,5);
     
@@ -146,7 +152,7 @@ void GameScene::instantiatePlatform() {
     //Random positioning helper variables
     
     //Get a position being x random in screen and y random inside a certain margin so we can always reach
-    float randX = RandomHelper::random_real((origin.x + p->getContentSize().width/2), ( origin.x + visibleSize.width - p->getContentSize().width/2));
+    float randX = RandomHelper::random_real((p->getContentSize().width/2), (visibleSize.width - p->getContentSize().width/2));
     //This is the separation between this platform and last one instantiated we need to control this so always can be reached
     float randYRange = RandomHelper::random_real((float)kMinPlatformStep, (float)kMaxPlatformStep);
     //Position it on top of last platform with the increased step
@@ -169,27 +175,27 @@ void GameScene::update(float dt)
 {
     //Character movement
     //If gets to the edge spawns on the other side of the screen
-    if(character->getPositionX()<origin.x && character->getPhysicsBody()->getVelocity().x < 0) {
+    if(character->getPositionX() < 0 && character->getPhysicsBody()->getVelocity().x < 0) {
         //Character is moving left and passed the left edge so spawn on the other side
         Vec2 pos = character->getPosition();
-        pos.x = origin.x + visibleSize.width; //The coordinate of the other side of the scree
+        pos.x = visibleSize.width; //The coordinate of the other side of the scree
         character->setPosition(pos);
-    } else if(character->getPositionX() > (origin.x + visibleSize.width) && character->getPhysicsBody()->getVelocity().x > 0) {
+    } else if(character->getPositionX() > visibleSize.width && character->getPhysicsBody()->getVelocity().x > 0) {
         //Character moving to the right and left the edge so spawn on the other side
         Vec2 pos = character->getPosition();
-        pos.x = origin.x; //The coordinate of the other side of the scree
+        pos.x = 0; //The coordinate of the other side of the scree
         character->setPosition(pos);
     }
     
     //Get the worlspace for character inside the node level to get its position relative to the screen
     Vec2 characterPos;
     characterPos = level->convertToWorldSpace(character->getPosition());
-    CCLOG("Char Position %f",characterPos.y);
+    //CCLOG("Char Position %f",characterPos.y);
     
     //Move node down if character avobe half screen
-    if(characterPos.y > origin.y + visibleSize.height/2) {
+    if(characterPos.y > visibleSize.height/2) {
         Vec2 pos = level->getPosition();
-        pos.y -= (float)scrollSpeed;
+        pos.y -= ((float)scrollSpeed);
         level->setPosition(pos);
     }
     
