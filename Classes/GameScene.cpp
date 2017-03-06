@@ -43,6 +43,9 @@ bool GameScene::init()
     //For now we set this manually
     PlatformType = type::grass;
     
+    //Initialize minPlatformModifier so we can increase the step of the platforms regularly
+    minPlatformModifier = kMinPlatformStep;
+    
     //Create the nodes here
     
     //Level
@@ -82,6 +85,20 @@ bool GameScene::init()
     
     level->addChild(character,5);
     
+    //Create UI
+    scoreLabel = Label::createWithTTF("0m", "fonts/KenVector Future.ttf", 32);
+    
+    scoreLabel->setAnchorPoint(Vec2( 0.5, 0.5 ));
+    
+    // position the label on the center of the screen
+    scoreLabel->setPosition(Vec2(origin.x + visibleSize.width/2,
+                                 origin.y + visibleSize.height*0.95));
+    
+    scoreLabel->setTextColor(Color4B::WHITE);
+    scoreLabel->enableOutline(Color4B(67,67,67,255),2);
+    
+    // add the label as a child to this layer
+    this->addChild(scoreLabel, 15);
     
     //Load the first batch of platforms
     instantiateInitialPlatforms();
@@ -140,7 +157,31 @@ void GameScene::instantiatePlatform() {
     //Also at some point we may also add enemies on top of this platforms that walk on them or just make them spiked
     
     //Create platforms
-    Platform* p = Platform::create(PlatformType, size::normal, state::normal);
+    size platformSize = size::normal;
+    
+    //Here we will add different random elements to start randomizing and increasing difficulty of level
+    if(score>500) {
+        //This from time to time therell bee a small platform
+        int p = RandomHelper::random_int(1, 3); //Modifie the max for less chance or more chance
+        if( p == 1) {
+            platformSize = size::small;
+        }
+    }
+    
+    //After 1000 we will start increasing the distance between platform to a limit
+    if(score > 1000) {
+        //Increase the min step by Platfrom Step Increase constant
+        minPlatformModifier = minPlatformModifier + kPlatformStepIncrease;
+        
+        //Control that the min step doesnt surpas the max step
+        if(minPlatformModifier > (kMaxPlatformStep-kMinPlatformStep)) {
+            //If its bigger we will do minPlatformModifier to be kMaxStep - kMinStep (200-50=150) so now platforms will be between 200 and 150
+            minPlatformModifier = (kMaxPlatformStep-kMinPlatformStep);
+        }
+    }
+    
+    //Create the platform with whatever parameters we get
+    Platform* p = Platform::create(PlatformType, platformSize, state::normal);
     p->setAnchorPoint(Vec2(0.5, 0.5));
     
     //Set the tag. The tags will be rotating among the platforms so
@@ -154,7 +195,7 @@ void GameScene::instantiatePlatform() {
     //Get a position being x random in screen and y random inside a certain margin so we can always reach
     float randX = RandomHelper::random_real((p->getContentSize().width/2), (visibleSize.width - p->getContentSize().width/2));
     //This is the separation between this platform and last one instantiated we need to control this so always can be reached
-    float randYRange = RandomHelper::random_real((float)kMinPlatformStep, (float)kMaxPlatformStep);
+    float randYRange = RandomHelper::random_real((float)minPlatformModifier, (float)kMaxPlatformStep);
     //Position it on top of last platform with the increased step
     float randY = lastPlatformYPosition + randYRange;
     
@@ -198,6 +239,13 @@ void GameScene::update(float dt)
         pos.y -= ((float)scrollSpeed);
         level->setPosition(pos);
     }
+    
+    //Score
+    score = std::abs(level->getPositionY()/3);
+    score *= 1; //To make it positive
+    char s[100] = {0};
+    sprintf(s, "%im", (int) score);
+    scoreLabel->setString (s);
     
     //If characterpos.y its < 0 means the character fell on the screen so game over
     if(characterPos.y < 0) {

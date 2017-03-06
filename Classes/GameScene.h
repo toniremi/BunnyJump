@@ -46,9 +46,13 @@ private:
     int currentPlatformTag;
     int targetPlatformToReset;
     float lastPlatformYPosition; //Holds the last platform y positon
+    int minPlatformModifier; //This will hold the min platform modifier and will be increased to a limit to make it harder
     
     Size visibleSize;
     Vec2 origin;
+    
+    //UI
+    Label *scoreLabel;
     
 private:
     //Methods

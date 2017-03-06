@@ -104,7 +104,7 @@ void Character::initOptions()
     this->addComponent(physicsBody);
     
     //Create an animation for the character for jumping
-    //We will do a 4 frames animation as follows : stand > ready > stand > jump and keep jump until touching something
+    //We will do a 4 frames animation as follows : stand => ready => stand => jump and keep jump until touching something
     char buff[100] = {0};
     //Generate the frames using the spritnf to change between female and male
     

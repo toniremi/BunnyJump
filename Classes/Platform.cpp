@@ -134,3 +134,22 @@ bool Platform::isBroken() {
     //Return false if its not broken
     return false;
 }
+
+#pragma mark - Platform Addons
+
+void Platform::AddSpikes() {
+    //If called will add spikes on the platform
+    
+    //Here we decide if they go on top or bottom
+    
+}
+
+void Platform::AddWalkingEnemy() {
+    //Add an enemy that kind of patrolls the platform
+    
+}
+
+void Platform::AddSpring() {
+    //Adds a spring that boosts our jump
+}
+

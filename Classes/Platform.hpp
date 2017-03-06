@@ -55,6 +55,17 @@ public:
     //Iv platform is broen on steping will break and fall down
     void PlatformBroke();
     
+    //This will add Spikes to the platform
+    void AddSpikes();
+    
+    //This will add an enemy to the platform (this enemy will walk on top of the platform)
+    void AddWalkingEnemy();
+    
+    //This will add a sprint to the platform
+    void AddSpring();
+    
+    
+    
     //This will destroy the platform and delete it from the scene
     void DestroyPlatform();
     

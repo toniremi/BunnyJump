@@ -12,7 +12,7 @@
 #define kMinPlatformStep	50
 #define kMaxPlatformStep	200 //this needs to be same as max jump force
 #define kNumPlatforms		15 //more platforms to avoid poping in the case they get together
-#define kPlatformTopPadding 10
+#define kPlatformStepIncrease 5
 #define kNormalJumpForce 200
 #define kSpringJumpForce 400
 #define kInitialPlatformTag 50 //This is to identify the platforms
