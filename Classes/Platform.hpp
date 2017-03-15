@@ -42,6 +42,22 @@ class Platform : public cocos2d::Sprite
 public:
     //Variables
     
+    //Setters
+    //Setter for type
+    void setType(type t) {
+        _type = t;
+    }
+    
+    //Setter for size
+    void setSize(size s) {
+        _size = s;
+    }
+    
+    //Setter for state
+    void setState(state st) {
+        _state = st;
+    }
+    
     //Methods
     Platform();
     ~Platform();
@@ -51,6 +67,9 @@ public:
     
     //Init with settag, physics body , etc
     void initOptions();
+
+    //Add decorations to ths platform if suitable
+    void AddDecorations();
     
     //Iv platform is broen on steping will break and fall down
     void PlatformBroke();
@@ -63,9 +82,7 @@ public:
     
     //This will add a sprint to the platform
     void AddSpring();
-    
-    
-    
+
     //This will destroy the platform and delete it from the scene
     void DestroyPlatform();
     
@@ -82,6 +99,7 @@ private:
     state _state;
     
     //Methods
+    
 };
 
 

@@ -182,7 +182,16 @@ void GameScene::instantiatePlatform() {
     
     //Create the platform with whatever parameters we get
     Platform* p = Platform::create(PlatformType, platformSize, state::normal);
+    //Add properties of the platform.
+    p->setType(PlatformType);
+    p->setSize(platformSize);
+    p->setState(state::normal);
+    
+    //Anchor point
     p->setAnchorPoint(Vec2(0.5, 0.5));
+    
+    state thestate = p->getState();
+    CCLOG("State %d",static_cast<int>(thestate));
     
     //Set the tag. The tags will be rotating among the platforms so
     int tag = currentPlatformTag+1;
@@ -191,6 +200,11 @@ void GameScene::instantiatePlatform() {
     //}
     p->setTag(tag); //Increase the tag
     //Random positioning helper variables
+    
+    //We add decoration
+    if(RandomHelper::random_int(1, 3) == 1) {
+        p->AddDecorations();
+    }
     
     //Get a position being x random in screen and y random inside a certain margin so we can always reach
     float randX = RandomHelper::random_real((p->getContentSize().width/2), (visibleSize.width - p->getContentSize().width/2));

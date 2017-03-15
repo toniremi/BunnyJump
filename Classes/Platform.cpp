@@ -9,7 +9,7 @@
 #include "Platform.hpp"
 
 using namespace cocos2d;
-
+//Modified the constructor a little bit so we can carry the properties of this platform from Create
 Platform::Platform() {}
 
 Platform::~Platform() {}
@@ -17,6 +17,10 @@ Platform::~Platform() {}
 //Just pass the gender we construct the sprite accoding to that gender passed.
 Platform* Platform::create(type t, size s, state st)
 {
+    //Create our platform object
+    Platform *pSprite = new Platform();
+
+    //Build the sprite name
     std::string _sprite = "ground_";
     //Type
     switch (t) {
@@ -77,16 +81,15 @@ Platform* Platform::create(type t, size s, state st)
     CCASSERT(frame != nullptr, msg);
 #endif
     
-    Platform *pSprite = new Platform();
-    
     if (pSprite && pSprite->initWithSpriteFrame(frame))
     {
         pSprite->autorelease();
         
+        //Init with some options
         pSprite->initOptions();
         
         //pSprite->scheduleUpdate(); // runs update()
-        
+    
         return pSprite;
     }
     
@@ -94,6 +97,7 @@ Platform* Platform::create(type t, size s, state st)
     return NULL;
 }
 
+//Init with options
 void Platform::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
@@ -117,6 +121,8 @@ void Platform::initOptions()
     
     //Add the physics body
     this->addComponent(physicsBody);
+    
+
 }
 
 state Platform::getState() {
@@ -136,9 +142,65 @@ bool Platform::isBroken() {
 }
 
 #pragma mark - Platform Addons
+//This method will basically add some decoration into the platform (grass , cactus, mushrooms,...)
+void Platform::AddDecorations() {
+    CCLOG("Size %d",static_cast<int>(_size));
+    //Depending on the type and size we will add one or more things
+    if(_size == size::small) {
+        //We should only add one object
+        if(_type == type::grass) {
+            //Decoration can be grass only or a mushroom
+            if(RandomHelper::random_int(1, 2) == 1) {
+                //Grass
+                char msg[256] = {0};
+                sprintf(msg, "grass%d.png", RandomHelper::random_int(1, 2));
+                auto decor = Sprite::createWithSpriteFrameName(msg);
+                decor->setAnchorPoint(Vec2(0.5, 0));
+                decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                this->addChild(decor,0);
+            } else {
+                //Mushrooms
+                if(RandomHelper::random_int(1, 2) == 1) {
+                    //Red Mushroom
+                    auto decor = Sprite::createWithSpriteFrameName("mushroom_red.png");
+                    decor->setAnchorPoint(Vec2(0.5, 0));
+                    decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                    this->addChild(decor);
+                } else {
+                    //Red Mushroom
+                    auto decor = Sprite::createWithSpriteFrameName("mushroom_brown.png");
+                    decor->setAnchorPoint(Vec2(0.5, 0));
+                    decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                    this->addChild(decor);
+                }
+            }
+        } else if(_type == type::sand) {
+            if(RandomHelper::random_int(1, 2) == 1) {
+                //Grass
+                char msg[256] = {0};
+                sprintf(msg, "grass_brown%d.png", RandomHelper::random_int(1, 2));
+                auto decor = Sprite::createWithSpriteFrameName(msg);
+                decor->setAnchorPoint(Vec2(0.5, 0));
+                decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                this->addChild(decor);
+            }
+        }
+    } else {
+        //We can add anything and even more than one. We will do groupsof predefined things to add but position will be random.
+        
+    }
+}
 
 void Platform::AddSpikes() {
+    
     //If called will add spikes on the platform
+    //The x will decide if they go on top or bottom
+    int y = RandomHelper::random_int(1, 4);
+    if(y==1) {
+
+    } else {
+        
+    }
     
     //Here we decide if they go on top or bottom
     
