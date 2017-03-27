@@ -150,30 +150,60 @@ void Character::initOptions()
     
 }
 
-void Character::jump() {
-    //Animate the character
-    //We dont really have a big spritesheet of the character being animated so we will use actions and time outs
-    //to change some sprites to give it some life
-     runAction(Animate::create(jumpAnim));
+//isDead
+//Tells other clases if the character is dead
+bool Character::isDead() {
+    //Tell others if character is dead. Useful for movement for example
+    return dead;
+}
+
+//Die
+//This methods kills the player and makes an animation. Also loads next scene , the game over scene.
+void Character::die() {
+    CCLOG("Player is DEAD");
+    //Mark as dead
+    dead = true;
+     char sprite[100] = {0};
+    //As animation we will change sprite and apply a short impulse up
+     snprintf(sprite, sizeof(sprite), "bunny%d_hurt.png", genderNum);
+    this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(sprite));
     
-    //Apply velocity
+    //Finally add the impulse up
     Vec2 vel = this->getPhysicsBody()->getVelocity();
     vel.y = kNormalJumpForce;//upwards - don't change x velocity
     this->getPhysicsBody()->setVelocity(vel);
-    
-    //stopAllActions();
-    //runAction(Animate::create(jumpAnim));
+}
+
+//Jump
+//This mthod makes the character jump automatically when touching a valid object like platforms , certain enemies or a spring
+void Character::jump() {
+    if(!dead) {
+        //Animate the character
+        //We dont really have a big spritesheet of the character being animated so we will use actions and time outs
+        //to change some sprites to give it some life
+        runAction(Animate::create(jumpAnim));
+        
+        //Apply velocity
+        Vec2 vel = this->getPhysicsBody()->getVelocity();
+        vel.y = kNormalJumpForce;//upwards - don't change x velocity
+        this->getPhysicsBody()->setVelocity(vel);
+    }
 }
 
 //Collision detection
 //Platforms have tag 2 for normal and tag 3 for broken
 bool Character::onContactBegin(cocos2d::PhysicsContact& contact)
 {
+    //If its dead ignore everything
+    if(dead) {
+        return false;
+    }
+    
     auto nodeA = contact.getShapeA()->getBody()->getNode();
     auto nodeB = contact.getShapeB()->getBody()->getNode();
     
     //by default its fallin
-    bool falling = true;
+    bool makeContact = true;
     
     if (nodeA && nodeB)
     {
@@ -192,12 +222,12 @@ bool Character::onContactBegin(cocos2d::PhysicsContact& contact)
             //If velocity its negative as faling then apply impulse if not just let it alone
             if(vel.y < 0) {
                 //Falling
-                falling = true;
+                makeContact = true;
                 //Make the character jump and animate it
                 this->jump();
             } else {
                 //We dont do anything and let it go through
-                falling = false;
+                makeContact = false;
             }
         }
         else if (nodeB->getName() == "Character" && nodeA->getName() == "Platform")
@@ -214,16 +244,45 @@ bool Character::onContactBegin(cocos2d::PhysicsContact& contact)
             Vec2 vel = nodeB->getPhysicsBody()->getVelocity();
             if(vel.y < 0) {
                 //Falling
-                falling = true;
+                makeContact = true;
                 //Make the character jump and animate it
                 this->jump();
             } else {
                 //We dont do anything and let it go through
-                falling = false;
+                makeContact = false;
+            }
+        } else if (nodeA->getName() == "Character" && nodeB->getName() == "Spikes") {
+            
+            //Pass through spikes no matter direction
+            makeContact = false;
+            
+            //Checking for spikes
+            Vec2 vel = nodeA->getPhysicsBody()->getVelocity();
+            //If velocity its negative as faling then apply impulse if not just let it alone
+            if(vel.y < 0 && nodeB->getTag() == kTopSpikeTag) {
+                //Falling on spikes
+                this->die();
+            } else if(vel.y > 0 && nodeB->getTag() == kBottomSpikeTag) {
+                //Hitting on spikes on jump
+                this->die();
+            }
+        } else if(nodeB->getName() == "Character" && nodeA->getName() == "Spikes") {
+            //Pass through spikes no matter direction
+            makeContact = false;
+            
+            //Checking for spikes
+            Vec2 vel = nodeB->getPhysicsBody()->getVelocity();
+            //If velocity its negative as faling then apply impulse if not just let it alone
+            if(vel.y < 0 && nodeA->getTag() == kTopSpikeTag) {
+                //Falling on spikes
+                this->die();
+            } else if(vel.y > 0 && nodeA->getTag() == kBottomSpikeTag){
+                //Hitting on spikes on jump
+                this->die();
             }
         }
     }
     
     //bodies can collide
-    return falling;
+    return makeContact;
 }

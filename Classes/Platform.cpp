@@ -157,7 +157,7 @@ void Platform::AddDecorations() {
                 auto decor = Sprite::createWithSpriteFrameName(msg);
                 decor->setAnchorPoint(Vec2(0.5, 0));
                 decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
-                this->addChild(decor,0);
+                this->addChild(decor,1);
             } else {
                 //Mushrooms
                 if(RandomHelper::random_int(1, 2) == 1) {
@@ -165,13 +165,13 @@ void Platform::AddDecorations() {
                     auto decor = Sprite::createWithSpriteFrameName("mushroom_red.png");
                     decor->setAnchorPoint(Vec2(0.5, 0));
                     decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
-                    this->addChild(decor);
+                    this->addChild(decor,1);
                 } else {
                     //Red Mushroom
                     auto decor = Sprite::createWithSpriteFrameName("mushroom_brown.png");
                     decor->setAnchorPoint(Vec2(0.5, 0));
                     decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
-                    this->addChild(decor);
+                    this->addChild(decor,1);
                 }
             }
         } else if(_type == type::sand) {
@@ -182,28 +182,141 @@ void Platform::AddDecorations() {
                 auto decor = Sprite::createWithSpriteFrameName(msg);
                 decor->setAnchorPoint(Vec2(0.5, 0));
                 decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
-                this->addChild(decor);
+                this->addChild(decor,1);
             }
         }
     } else {
         //We can add anything and even more than one. We will do groupsof predefined things to add but position will be random.
-        
+        if(_type == type::grass) {
+            //Decoration can be grass only or a mushroom
+            if(RandomHelper::random_int(1, 2) == 1) {
+                //Grass Normal (Green)
+                char msg[256] = {0};
+                sprintf(msg, "grass%d.png", RandomHelper::random_int(1, 2));
+                auto decor = Sprite::createWithSpriteFrameName(msg);
+                decor->setAnchorPoint(Vec2(0.5, 0));
+                decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                this->addChild(decor,1);
+            } else {
+                //Mushrooms
+                if(RandomHelper::random_int(1, 2) == 1) {
+                    //Red Mushroom
+                    auto decor = Sprite::createWithSpriteFrameName("mushroom_red.png");
+                    decor->setAnchorPoint(Vec2(0.5, 0));
+                    decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                    this->addChild(decor,1);
+                } else {
+                    //Red Mushroom
+                    auto decor = Sprite::createWithSpriteFrameName("mushroom_brown.png");
+                    decor->setAnchorPoint(Vec2(0.5, 0));
+                    decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                    this->addChild(decor,1);
+                }
+            }
+        } else if(_type == type::sand) {
+            if(RandomHelper::random_int(1, 2) == 1) {
+                //Grass Brown
+                char msg[256] = {0};
+                sprintf(msg, "grass_brown%d.png", RandomHelper::random_int(1, 2));
+                auto decor = Sprite::createWithSpriteFrameName(msg);
+                decor->setAnchorPoint(Vec2(0.5, 0));
+                decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                this->addChild(decor,1);
+            } else {
+                //Cactus
+                auto decor = Sprite::createWithSpriteFrameName("cactus.png");
+                decor->setAnchorPoint(Vec2(0.5, 0));
+                decor->setPosition(Vec2(RandomHelper::random_real( 0+decor->getContentSize().width, this->getContentSize().width-decor->getContentSize().width),this->getContentSize().height));
+                this->addChild(decor,1);
+            }
+        }
     }
 }
 
 void Platform::AddSpikes() {
     
-    //If called will add spikes on the platform
-    //The x will decide if they go on top or bottom
-    int y = RandomHelper::random_int(1, 4);
-    if(y==1) {
-
+    //Set as containing traps
+    containsTraps = true;
+    
+    //This will hold the name of the sprite there are two for one sike or group of spikes
+    String spike = "";
+    if(RandomHelper::random_int(1, 2) == 1) {
+        spike = "spike";
     } else {
-        
+        spike = "spikes";
     }
     
     //Here we decide if they go on top or bottom
-    
+    //If called will add spikes on the platform
+    //The x will decide if they go on top or bottom
+    int y = RandomHelper::random_int(1, 2);
+    if(y==1) {
+        //Top
+        std::string sprite = spike.getCString();
+        sprite += "_top.png";
+        
+        //Create Sprite
+        auto trap = Sprite::createWithSpriteFrameName(sprite);
+        //Anchor
+        trap->setAnchorPoint(Vec2(0.5, 0));
+        //Position it inside the platform
+        float posY = this->getContentSize().height-3.5f;
+        float min = trap->getContentSize().width/2;
+        float max = this->getContentSize().width-(trap->getContentSize().width/2);
+        float posX = RandomHelper::random_real(min, max);
+        //Set position
+        trap->setPosition(Vec2(posX,posY));
+        //Add name
+        trap->setName("Spikes");
+        //Add tag for identification on collision
+        trap->setTag(kTopSpikeTag);
+        //Set physicis body
+        auto physicsBody = PhysicsBody::createBox(Size(trap->getContentSize().width,trap->getContentSize().height),
+                                                  PhysicsMaterial(0.1f, 1.0f, 0.0f));
+        physicsBody->setDynamic(false);
+        
+        physicsBody->setCategoryBitmask(0x01);    // 0010
+        physicsBody->setContactTestBitmask(0xFFFFFFFF);
+        
+        //Add the physics body
+        trap->addComponent(physicsBody);
+        
+        //Add it to the platform. or asthetics reasons we add it behind platform.
+        this->addChild(trap,-1);
+        
+    } else {
+        //Bottom
+        std::string sprite = spike.getCString();
+        sprite += "_bottom.png";
+        
+        //Create Sprite
+        auto trap = Sprite::createWithSpriteFrameName(sprite);
+        //Anchor
+        trap->setAnchorPoint(Vec2(0.5, 1));
+        //Position it inside the platform
+        float posY = 3.5f;
+        float min = trap->getContentSize().width/2;
+        float max = this->getContentSize().width-(trap->getContentSize().width/2);
+        float posX = RandomHelper::random_real(min, max);
+        //Set position
+        trap->setPosition(Vec2(posX,posY));
+        //Add name
+        trap->setName("Spikes");
+        //Add tag for identification in collision
+        trap->setTag(kBottomSpikeTag);
+        //Set physicis body
+        auto physicsBody = PhysicsBody::createBox(Size(trap->getContentSize().width,trap->getContentSize().height),
+                                                  PhysicsMaterial(0.1f, 1.0f, 0.0f));
+        physicsBody->setDynamic(false);
+        
+        physicsBody->setCategoryBitmask(0x01);    // 0010
+        physicsBody->setContactTestBitmask(0xFFFFFFFF);
+        
+        //Add the physics body
+        trap->addComponent(physicsBody);
+        
+        this->addChild(trap,-1);
+    }
 }
 
 void Platform::AddWalkingEnemy() {

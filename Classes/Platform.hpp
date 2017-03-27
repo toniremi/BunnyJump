@@ -10,6 +10,7 @@
 #define Platform_hpp
 
 #include "cocos2d.h"
+#include "Constants.h"
 
 using namespace cocos2d;
 
@@ -41,6 +42,8 @@ class Platform : public cocos2d::Sprite
 {
 public:
     //Variables
+    //Boolean to know if the platform contains traps or enemies in which case do not add bonuses , coins or other stuff
+    bool containsTraps = false;
     
     //Setters
     //Setter for type
@@ -91,6 +94,7 @@ public:
     
     //Asks the latform if its a broken platform or not if it is after this jump will get destroyed
     bool isBroken();
+    
     
 private:
     //Variables

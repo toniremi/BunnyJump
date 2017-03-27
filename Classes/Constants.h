@@ -19,4 +19,8 @@
 #define kCharacterXVelocity 100; //The velocity at which the character moves on touch on left or right side of the screen
 #define scrollSpeed 4
 
+//Trap Tags
+#define kTopSpikeTag 333
+#define kBottomSpikeTag 334
+
 #endif /* Constants_h */

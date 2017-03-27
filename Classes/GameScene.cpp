@@ -12,10 +12,10 @@ Scene* GameScene::createScene()
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
     
-    scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    //scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     
-    //Increase speed to make things fel snapier
-    scene->getPhysicsWorld()->setSpeed(2.0f);
+    //Increase speed to make things feel snapier
+    scene->getPhysicsWorld()->setSpeed(2.5f);
     
     // 'layer' is an autorelease object
     auto layer = GameScene::create();
@@ -160,7 +160,7 @@ void GameScene::instantiatePlatform() {
     size platformSize = size::normal;
     
     //Here we will add different random elements to start randomizing and increasing difficulty of level
-    if(score>500) {
+    if(score>250) {
         //This from time to time therell bee a small platform
         int p = RandomHelper::random_int(1, 3); //Modifie the max for less chance or more chance
         if( p == 1) {
@@ -169,7 +169,7 @@ void GameScene::instantiatePlatform() {
     }
     
     //After 1000 we will start increasing the distance between platform to a limit
-    if(score > 1000) {
+    if(score > 500) {
         //Increase the min step by Platfrom Step Increase constant
         minPlatformModifier = minPlatformModifier + kPlatformStepIncrease;
         
@@ -220,9 +220,14 @@ void GameScene::instantiatePlatform() {
     currentPlatformTag = p->getTag();
     lastPlatformYPosition = p->getPositionY();
     
+    //Modify created platforms
+    if(score > 0 && platformSize == size::normal) {
+        //From time to time introduce spiked
+        p->AddSpikes();
+    }
+    
     //finally add it to platforms node
     platforms->addChild(p,0);
-
 }
 
 
@@ -230,18 +235,20 @@ void GameScene::update(float dt)
 {
     //Character movement
     //If gets to the edge spawns on the other side of the screen
-    if(character->getPositionX() < 0 && character->getPhysicsBody()->getVelocity().x < 0) {
-        //Character is moving left and passed the left edge so spawn on the other side
-        Vec2 pos = character->getPosition();
-        pos.x = visibleSize.width; //The coordinate of the other side of the scree
-        character->setPosition(pos);
-    } else if(character->getPositionX() > visibleSize.width && character->getPhysicsBody()->getVelocity().x > 0) {
-        //Character moving to the right and left the edge so spawn on the other side
-        Vec2 pos = character->getPosition();
-        pos.x = 0; //The coordinate of the other side of the scree
-        character->setPosition(pos);
+    if(!character->isDead()) {
+        if(character->getPositionX() < 0 && character->getPhysicsBody()->getVelocity().x < 0) {
+            //Character is moving left and passed the left edge so spawn on the other side
+            Vec2 pos = character->getPosition();
+            pos.x = visibleSize.width; //The coordinate of the other side of the scree
+            character->setPosition(pos);
+        } else if(character->getPositionX() > visibleSize.width && character->getPhysicsBody()->getVelocity().x > 0) {
+            //Character moving to the right and left the edge so spawn on the other side
+            Vec2 pos = character->getPosition();
+            pos.x = 0; //The coordinate of the other side of the scree
+            character->setPosition(pos);
+        }
     }
-    
+
     //Get the worlspace for character inside the node level to get its position relative to the screen
     Vec2 characterPos;
     characterPos = level->convertToWorldSpace(character->getPosition());

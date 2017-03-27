@@ -33,6 +33,8 @@ public:
    
     void initOptions();
     
+    bool isDead();
+    
 private:
     
     //Variables
@@ -43,11 +45,16 @@ private:
     //Animation of character
     Animation *jumpAnim;
     
+    //If its dead do not get input
+    bool dead;
+    
     //Methods
     bool onContactBegin(PhysicsContact& contact);
     
     //Method to make the character jump including the animation
     void jump();
+    
+    void die();
 };
 
 #endif /* Character_hpp */
