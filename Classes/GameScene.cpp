@@ -3,6 +3,10 @@
 
 #include "Constants.h"
 
+#include "GameSingleton.hpp"
+
+#include "GameOverScene.hpp"
+
 #include <stdlib.h> //For rand()
 
 USING_NS_CC;
@@ -271,6 +275,11 @@ void GameScene::update(float dt)
     //If characterpos.y its < 0 means the character fell on the screen so game over
     if(characterPos.y < 0) {
         CCLOG("GAME OVER");
+        //Save score to pass to game over scene
+        GameSingleton::getInstance()->setGameScore(score);
+        
+        //Go to game over scene
+        Director::getInstance()->replaceScene(TransitionFade::create(0.5, GameOverScene::createScene(), Color3B(67,67,67)));
     }
     
     //Go trhough the platforms and respawn platforms out of the screen at the bottom for newer ones on top

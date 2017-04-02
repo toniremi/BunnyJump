@@ -90,6 +90,8 @@
 		9283DC0E1E579E0200700266 /* sprites.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9283DC0C1E579E0200700266 /* sprites.plist */; };
 		9283DC0F1E579E0200700266 /* sprites.png in Resources */ = {isa = PBXBuildFile; fileRef = 9283DC0D1E579E0200700266 /* sprites.png */; };
 		A9B651FE1E5B929D0029FBCD /* Platform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9B651FC1E5B929D0029FBCD /* Platform.cpp */; };
+		A9FE2D5D1E9149F400B885DD /* GameOverScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9FE2D5B1E9149F400B885DD /* GameOverScene.cpp */; };
+		A9FE2D611E914C6700B885DD /* GameSingleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9FE2D5F1E914C6700B885DD /* GameSingleton.cpp */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
 		BF1C47F01293687400B63C5D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1C47EA1293683800B63C5D /* QuartzCore.framework */; };
@@ -225,6 +227,10 @@
 		A9B651FC1E5B929D0029FBCD /* Platform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Platform.cpp; sourceTree = "<group>"; };
 		A9B651FD1E5B929D0029FBCD /* Platform.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Platform.hpp; sourceTree = "<group>"; };
 		A9B652001E5BAF620029FBCD /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		A9FE2D5B1E9149F400B885DD /* GameOverScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameOverScene.cpp; sourceTree = "<group>"; };
+		A9FE2D5C1E9149F400B885DD /* GameOverScene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GameOverScene.hpp; sourceTree = "<group>"; };
+		A9FE2D5F1E914C6700B885DD /* GameSingleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameSingleton.cpp; sourceTree = "<group>"; };
+		A9FE2D601E914C6700B885DD /* GameSingleton.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GameSingleton.hpp; sourceTree = "<group>"; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BF170DB412928DE900B8313A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		BF1C47EA1293683800B63C5D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -378,10 +384,14 @@
 				A9B652001E5BAF620029FBCD /* Constants.h */,
 				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
+				A9FE2D5B1E9149F400B885DD /* GameOverScene.cpp */,
+				A9FE2D5C1E9149F400B885DD /* GameOverScene.hpp */,
 				46880B8619C43A87006E1F66 /* GameScene.cpp */,
 				46880B8719C43A87006E1F66 /* GameScene.h */,
 				9283DBD01E5788A800700266 /* MainScene.cpp */,
 				9283DBD11E5788A800700266 /* MainScene.h */,
+				A9FE2D5F1E914C6700B885DD /* GameSingleton.cpp */,
+				A9FE2D601E914C6700B885DD /* GameSingleton.hpp */,
 				9283DC091E5798A100700266 /* Character.cpp */,
 				9283DC0A1E5798A100700266 /* Character.hpp */,
 				A9B651FC1E5B929D0029FBCD /* Platform.cpp */,
@@ -660,8 +670,10 @@
 				A9B651FE1E5B929D0029FBCD /* Platform.cpp in Sources */,
 				9283DC0B1E5798A100700266 /* Character.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
+				A9FE2D611E914C6700B885DD /* GameSingleton.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
+				A9FE2D5D1E9149F400B885DD /* GameOverScene.cpp in Sources */,
 				9283DBD21E5788A800700266 /* MainScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
